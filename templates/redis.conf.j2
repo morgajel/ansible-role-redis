@@ -14,9 +14,11 @@ logfile {{ redis_logfile }}
 
 # To enable logging to the system logger, just set 'syslog-enabled' to yes,
 # and optionally update the other syslog parameters to suit your needs.
-# syslog-enabled no
-# syslog-ident redis
-# syslog-facility local0
+{% if redis_syslog_enabled %}
+syslog-enabled yes
+syslog-ident {{ redis_syslog_ident }}
+syslog-facility {{ redis_syslog_facility }}
+{%endif%}
 
 databases {{ redis_databases }}
 
@@ -39,6 +41,12 @@ maxmemory-samples {{ redis_maxmemory_samples }}
 appendonly {{ redis_appendonly }}
 appendfsync {{ redis_appendfsync }}
 no-appendfsync-on-rewrite no
+
+{% if redis_extra_settings %}
+	{% for extra_setting in redis_extra_settings|dictsort %}
+{{ extra_setting }} {{ redis_extra_settings }}
+	{% endfor %}
+{%endif%}
 
 {% for include in redis_includes %}
 include {{ include }}
